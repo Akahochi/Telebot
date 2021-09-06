@@ -34,16 +34,12 @@ def get_todays_todos(user_id):
             WHERE date = ? 
             AND user_id = ?;
             """
-    result = cur.execute(command, (today, user_id)).result.fetchall()
-    i = 0
-
-    for n in result[i]:
-        greeting = "Hello, your tasks for today: \n"
-        message = f"{greeting}{n}"
-
-
-
+    result = cur.execute(command, (today, user_id)).fetchall()
+    greeting = "Hello, your tasks for today: \n"
+    message = f"{greeting}{result}"
     return message
+
+
 
 
 # """
