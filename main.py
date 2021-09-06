@@ -13,11 +13,11 @@ def is_valid_name_surname(name_surname):
 @bot.message_handler(content_types=["text"])
 def start(message):
     user_id = message.from_user.id
-    if message.text == "Регистрация":
-        process_registration(user_id)
-    elif message.text == "TO-DO лист":
-        process_add_todo(user_id)
-    elif message.text == "Что у меня сегодня?":
+    if message.text == "Registration":
+        process_registration(user_id, message)
+    elif message.text == "TO-DO":
+        process_add_todo(user_id, message)
+    elif message.text == "What do I have today?":
          process_get_todays_todos(user_id)
     else:
         render_initial_keyboard(user_id)
