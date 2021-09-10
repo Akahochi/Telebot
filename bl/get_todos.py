@@ -3,6 +3,9 @@ from datetime import datetime
 import os
 import sqlite3
 
+from sqlalchemy import and_
+
+from bl.add_todo import Todo_text, Session
 from bl.constants import todos_fildnames
 from bot import bot
 
@@ -15,31 +18,47 @@ def process_get_todays_todos(user_id):
     # else:
     #     todos = get_todays_todos(user_id)
     #     bot.send_message(user_id, todos)
-    """ For SQLite"""
+    """ For SQLite and For SQAlchemy"""
     todos = get_todays_todos(user_id)
     bot.send_message(user_id, todos)
 
+
 """
-Function that "pulls" todo from SQLite data
+Function that "pulls" todo from SQAlchemy data
 """
 
 
 def get_todays_todos(user_id):
-    conn = sqlite3.connect('todo.db', check_same_thread=False)
-    cur = conn.cursor()
     message = ""
     today = datetime.utcnow().date().strftime("%d.%m.%Y")
-    command = """
-            SELECT todo FROM todo 
-            WHERE date = ? 
-            AND user_id = ?;
-            """
-    result = cur.execute(command, (today, user_id)).fetchall()
-    greeting = "Hello, your tasks for today: \n"
-    message = f"{greeting}{result}"
+    with Session() as session:
+        some_todo = session.query(Todo_text).filter(and_(Todo_text.date == today, Todo_text.user_id == user_id)).all()
+        if not some_todo:
+            message = "There are no tasks for you today"
+        else:
+            for row in some_todo:
+                message = f"Hello, your tasks for today: \n {row.todo_text}"
     return message
+    session.commit()
 
 
+# """
+# Function that "pulls" todo from SQLite data
+# """
+# def get_todays_todos(user_id):
+#     conn = sqlite3.connect('todo.db', check_same_thread=False)
+#     cur = conn.cursor()
+#     message = ""
+#     today = datetime.utcnow().date().strftime("%d.%m.%Y")
+#     command = """
+#             SELECT todo FROM todo
+#             WHERE date = ?
+#             AND user_id = ?;
+#             """
+#     result = cur.execute(command, (today, user_id)).fetchall()
+#     greeting = "Hello, your tasks for today: \n"
+#     message = f"{greeting}{result}"
+#     return message
 
 
 # """
@@ -69,4 +88,3 @@ def get_todays_todos(user_id):
 #         todos = "\n".join(enumerated_todos)
 #         message = f"{greeting}{todos}"
 #     return message
-
