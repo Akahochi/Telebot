@@ -36,8 +36,10 @@ def get_todays_todos(user_id):
         if not some_todo:
             message = "There are no tasks for you today"
         else:
+            f = []
             for row in some_todo:
-                message = f"Hello, your tasks for today: \n {row.todo_text}"
+                f.append(row.todo_text)
+            message = f"Hello, your tasks for today: \n {f}"
     return message
     session.commit()
 
